@@ -32,8 +32,6 @@ function App() {
             <Route path="/strategy" element={<div>Strategy Page</div>} />
             <Route path="/objectives" element={<div>Objectives Page</div>} />
             <Route path="/documents" element={<div>Documents Page</div>} />
-            <Route path="/settings" element={<div>setting Page</div>} />
-            <Route path="/users" element={<div>Users Profiles</div>} />
           </Route>
         </Routes>
       </Router>
