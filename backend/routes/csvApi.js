@@ -1,197 +1,82 @@
+// // csvApi.js
+// const express = require('express');
+// const cors = require('cors');
+// const csvHandler = require('../utils/csvHandler');
+
+// const app = express();
+// const port = 3000;
+
+// app.use(cors());
+// app.use(express.json());
+
+// // API Endpoint to get all approaches
+// app.get('/approaches', (req, res) => {
+//   const approaches = csvHandler.getApproaches();
+//   res.json(approaches);
+// });
+
+// // API Endpoint to get a single approach by its code
+// app.get('/approaches/:code', (req, res) => {
+//   const { code } = req.params;
+//   const approach = csvHandler.getApproachByCode(code);
+//   if (approach) {
+//     res.json(approach);
+//   } else {
+//     res.status(404).json({ error: 'Approach not found' });
+//   }
+// });
+
+// // API Endpoint to get all available filter options
+// app.get('/filters', (req, res) => {
+//   const filters = csvHandler.getFilterOptions();
+//   res.json(filters);
+// });
+
+// // Load data and start the server
+// csvHandler.loadData()
+//   .then(() => {
+//     app.listen(port, () => {
+//       console.log(`Server is running on http://localhost:${port}`);
+//       console.log('Available endpoints:');
+//       console.log(`  GET http://localhost:${port}/approaches`);
+//       console.log(`  GET http://localhost:${port}/approaches/:code`);
+//       console.log(`  GET http://localhost:${port}/filters`);
+//     });
+//   })
+//   .catch(error => {
+//     console.error("Failed to start server:", error);
+//     process.exit(1);
+//   });
+
+
+// routes/csvApi.js - Defines only the API routes
 const express = require('express');
-const router = express.Router();
-const { readCsvFile, readCsvFileAdvanced, getAllCsvFiles, getCsvStructure } = require('../utils/csvHandler');
+const router = express.Router(); // Use express.Router, not a full app
+const csvHandler = require('../utils/csvHandler'); // Correct path to the handler
 
-// Get all available CSV files
-router.get('/files', async (req, res) => {
-  try {
-    const files = await getAllCsvFiles();
-    res.json({ 
-      success: true, 
-      files,
-      message: `Found ${files.length} CSV files`
-    });
-  } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      error: error.message 
-    });
+// API Endpoint to get all approaches
+// Path is now '/' because '/api' is handled in server.js
+router.get('/approaches', (req, res) => {
+  const approaches = csvHandler.getApproaches();
+  res.json(approaches);
+});
+
+// API Endpoint to get a single approach by its code
+router.get('/approaches/:code', (req, res) => {
+  const { code } = req.params;
+  const approach = csvHandler.getApproachByCode(code);
+  if (approach) {
+    res.json(approach);
+  } else {
+    res.status(404).json({ error: 'Approach not found' });
   }
 });
 
-// Get CSV file structure (headers)
-router.get('/:filename/structure', async (req, res) => {
-  try {
-    const { filename } = req.params;
-    const headers = await getCsvStructure(filename);
-    res.json({ 
-      success: true, 
-      filename,
-      headers,
-      totalHeaders: headers.length,
-      sampleStructure: headers.reduce((obj, header, index) => {
-        obj[header] = `نمونه مقدار ${index + 1}`;
-        return obj;
-      }, {})
-    });
-  } catch (error) {
-    res.status(404).json({ 
-      success: false, 
-      error: error.message 
-    });
-  }
+// API Endpoint to get all available filter options
+router.get('/filters', (req, res) => {
+  const filters = csvHandler.getFilterOptions();
+  res.json(filters);
 });
 
-// Dynamic route for CSV files (Simple parser)
-router.get('/:filename', async (req, res) => {
-  try {
-    const { filename } = req.params;
-    const { advanced = false } = req.query;
-    
-    // انتخاب parser مناسب
-    const data = advanced === 'true' 
-      ? await readCsvFileAdvanced(filename)
-      : await readCsvFile(filename);
-    
-    const response = {
-      success: true,
-      filename,
-      totalRecords: data.length,
-      parserType: advanced === 'true' ? 'advanced' : 'simple',
-      data,
-      sampleRecord: data.length > 0 ? data[0] : null,
-      availableFields: data.length > 0 ? Object.keys(data[0]) : []
-    };
-    
-    res.json(response);
-  } catch (error) {
-    res.status(404).json({ 
-      success: false, 
-      error: error.message,
-      filename: req.params.filename
-    });
-  }
-});
-
-// Get approaches with filtering
-router.get('/approaches/filter', async (req, res) => {
-  try {
-    const data = await readCsvFile('approaches');
-    const { 
-      معیار: criteria, 
-      زیرمعیار: subCriteria, 
-      'عنوان رویکرد': title,
-      'کد رویکرد': code,
-      search 
-    } = req.query;
-    
-    let filteredData = data;
-    
-    // فیلتر بر اساس معیار
-    if (criteria) {
-      filteredData = filteredData.filter(item => 
-        item['معیار'] && item['معیار'].toLowerCase().includes(criteria.toLowerCase())
-      );
-    }
-    
-    // فیلتر بر اساس زیرمعیار
-    if (subCriteria) {
-      filteredData = filteredData.filter(item => 
-        item['زیرمعیار'] && item['زیرمعیار'].toLowerCase().includes(subCriteria.toLowerCase())
-      );
-    }
-    
-    // فیلتر بر اساس عنوان
-    if (title) {
-      filteredData = filteredData.filter(item => 
-        item['عنوان رویکرد'] && item['عنوان رویکرد'].toLowerCase().includes(title.toLowerCase())
-      );
-    }
-    
-    // فیلتر بر اساس کد
-    if (code) {
-      filteredData = filteredData.filter(item => 
-        item['کد رویکرد'] && item['کد رویکرد'].toLowerCase().includes(code.toLowerCase())
-      );
-    }
-    
-    // جستجو عمومی
-    if (search) {
-      const searchTerm = search.toLowerCase();
-      filteredData = filteredData.filter(item => {
-        return Object.values(item).some(value => 
-          value && value.toString().toLowerCase().includes(searchTerm)
-        );
-      });
-    }
-    
-    res.json({ 
-      success: true, 
-      data: filteredData, 
-      total: filteredData.length,
-      originalTotal: data.length,
-      filters: { criteria, subCriteria, title, code, search },
-      availableFields: data.length > 0 ? Object.keys(data[0]) : []
-    });
-  } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      error: error.message 
-    });
-  }
-});
-
-// Get single approach by code
-router.get('/approaches/detail/:code', async (req, res) => {
-  try {
-    const { code } = req.params;
-    const data = await readCsvFile('approaches');
-    
-    const approach = data.find(item => item['کد رویکرد'] === code);
-    
-    if (!approach) {
-      return res.status(404).json({
-        success: false,
-        error: `Approach with code ${code} not found`
-      });
-    }
-    
-    res.json({
-      success: true,
-      data: approach
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
-  }
-});
-
-// Get unique values for a specific field
-router.get('/:filename/values/:field', async (req, res) => {
-  try {
-    const { filename, field } = req.params;
-    const data = await readCsvFile(filename);
-    
-    const uniqueValues = [...new Set(
-      data
-        .map(item => item[field])
-        .filter(value => value && value.trim() !== '')
-    )];
-    
-    res.json({
-      success: true,
-      field,
-      values: uniqueValues,
-      total: uniqueValues.length
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
-  }
-});
-
+// Export the router so it can be used by server.js
 module.exports = router;

@@ -1,235 +1,102 @@
-import React, { useState, useEffect } from 'react';
-import { X, ChevronDown, ChevronUp } from 'lucide-react';
-import './FilterPanel.css';
+// src/components/Approaches/FilterPanel.tsx
+import React from 'react';
 
-interface FilterPanelProps {
-  filters: {
-    criteria: string[];
-    subCriteria: string[];
-    strategies: string[];
-    strategicObjectives: string[];
-    processes: string[];
-  };
-  onFiltersChange: (filters: any) => void;
-  approaches: any[];
+// Define types for filters
+interface FilterOptions {
+  criteria: string[];
+  subcriteria: string[];
+  strategies: string[];
+  strategicObjectives: string[];
+  processes: string[];
 }
 
-interface FilterOption {
-  id: string;
-  name: string;
-  count: number;
+interface ActiveFilters {
+  criteria: string[];
+  subcriteria: string[];
+  strategies: string[];
+  strategicObjectives: string[];
+  processes: string[];
 }
 
-const FilterPanel: React.FC<FilterPanelProps> = ({
-  filters,
-  onFiltersChange,
-  approaches
+interface Props {
+  filterOptions: FilterOptions | null;
+  activeFilters: ActiveFilters;
+  onFilterChange: (filterType: keyof ActiveFilters, value: string) => void;
+  onResetFilters: () => void;
+  approaches: any[]; // We need all approaches to determine dependencies
+}
+
+const FilterPanel: React.FC<Props> = ({
+  filterOptions,
+  activeFilters,
+  onFilterChange,
+  onResetFilters,
+  approaches,
 }) => {
-  // State برای گزینه‌های فیلتر
-  const [criteriaOptions, setCriteriaOptions] = useState<FilterOption[]>([]);
-  const [subCriteriaOptions, setSubCriteriaOptions] = useState<FilterOption[]>([]);
-  const [strategiesOptions, setStrategiesOptions] = useState<FilterOption[]>([]);
-  const [objectivesOptions, setObjectivesOptions] = useState<FilterOption[]>([]);
-  const [processesOptions, setProcessesOptions] = useState<FilterOption[]>([]);
+  if (!filterOptions) {
+    return <div>در حال بارگذاری فیلترها...</div>;
+  }
 
-  // State برای باز/بسته بودن بخش‌ها
-  const [expandedSections, setExpandedSections] = useState({
-    criteria: true,
-    subCriteria: true,
-    strategies: true,
-    objectives: true,
-    processes: true
-  });
-
-  // بارگذاری گزینه‌های فیلتر از API
-  useEffect(() => {
-    fetchFilterOptions();
-  }, []);
-
-  // به‌روزرسانی گزینه‌های فیلتر بر اساس فیلترهای فعال
-  useEffect(() => {
-    updateFilterOptions();
-  }, [filters, approaches]);
-
-  // const fetchFilterOptions = async () => {
-  //   try {
-  //     // بارگذاری معیارها
-  //     const criteriaRes = await fetch('/api/approaches/values/criteria');
-  //     if (!criteriaRes.ok) {
-  //       console.error('درخواست برای معیارها با شکست مواجه شد');
-  //       setCriteriaOptions([]); // در صورت خطا، با آرایه خالی مقداردهی کنید
-  //       return; // از ادامه تابع خارج شوید
-  //     }
-  //     const criteria = await criteriaRes.json();
-
-  //   // این خط را اضافه کنید تا ساختار واقعی داده را ببینیم
-  //   console.log('Data received for criteria:', criteria); 
-
-
-
-  //   if (Array.isArray(criteria)) {
-  //     setCriteriaOptions(criteria.map((c: any) => ({
-  //       id: c.id,
-  //       name: c.name,
-  //       count: 0
-  //     })));
-  //   }else {
-  //             console.error("فرمت داده‌های دریافتی برای معیارها صحیح نیست.");
-  //       setCriteriaOptions([]); // اطمینان از اینکه state یک آرایه باقی می‌ماند
-  //   }
-  //     // بارگذاری سایر گزینه‌ها...
-  //     // (کد مشابه برای سایر فیلترها)
-
-  //   } catch (error) {
-  //     console.error('خطا در بارگذاری گزینه‌های فیلتر:', error);
-  //   }
-  // };
-
-  // در فایل src/components/Approaches/FilterPanel.tsx
-
-  const fetchFilterOptions = async () => {
-    try {
-      const criteriaRes = await fetch('/api/approaches/values/criteria');
-      if (!criteriaRes.ok) {
-        console.error('درخواست برای معیارها با شکست مواجه شد');
-        setCriteriaOptions([]);
-        return;
-      }
-      // نام متغیر را به responseData تغییر می‌دهیم تا خواناتر باشد
-      const responseData = await criteriaRes.json();
-      console.log('Data received for criteria:', responseData); // این خط برای دیباگ عالی است
-
-      // 1. لیست معیارها را از داخل آبجکت پاسخ استخراج می‌کنیم
-      const criteriaList = responseData.values;
-
-      // 2. بررسی می‌کنیم که آیا criteriaList واقعاً یک آرایه است
-      if (Array.isArray(criteriaList)) {
-
-        // 3. چون criteriaList آرایه‌ای از رشته‌هاست،
-        // ما باید خودمان آبجکت مورد نیاز را بسازیم.
-        const formattedCriteria = criteriaList.map((criterionName: string, index: number) => ({
-          // از ایندکس آرایه به عنوان یک id موقت استفاده می‌کنیم
-          id: (index + 1).toString(),
-          // خود رشته را به عنوان نام معیار قرار می‌دهیم
-          name: criterionName,
-          count: 0 // این را مثل قبل نگه می‌داریم
-        }));
-
-        setCriteriaOptions(formattedCriteria);
-
-      } else {
-        console.error("فرمت داده‌های دریافتی برای معیارها صحیح نیست (responseData.values یک آرایه نیست).");
-        setCriteriaOptions([]);
-      }
-
-    } catch (error) {
-      console.error('خطا در بارگذاری گزینه‌های فیلتر:', error);
-      setCriteriaOptions([]);
+  // --- Cascading Filter Logic ---
+  // Determine which subcriteria are available based on selected criteria
+  const availableSubcriteria = React.useMemo(() => {
+    if (activeFilters.criteria.length === 0) {
+      return filterOptions.subcriteria; // Show all if no criteria is selected
     }
-  };
-
-
-
-
-
-  const updateFilterOptions = () => {
-    // به‌روزرسانی تعداد هر گزینه بر اساس رویکردهای فیلتر شده
-    // پیاده‌سازی منطق AND برای فیلترها
-  };
-
-  const handleFilterChange = (filterType: string, value: string, checked: boolean) => {
-    const newFilters = { ...filters };
-
-    if (checked) {
-      newFilters[filterType as keyof typeof filters].push(value);
-    } else {
-      newFilters[filterType as keyof typeof filters] =
-        newFilters[filterType as keyof typeof filters].filter((item: string) => item !== value);
-    }
-
-    onFiltersChange(newFilters);
-  };
-
-  const clearAllFilters = () => {
-    onFiltersChange({
-      criteria: [],
-      subCriteria: [],
-      strategies: [],
-      strategicObjectives: [],
-      processes: []
+    const relatedSubcriteria = new Set<string>();
+    approaches.forEach(app => {
+      if (activeFilters.criteria.includes(app.criteria)) {
+        relatedSubcriteria.add(app.subcriteria);
+      }
     });
-  };
+    return Array.from(relatedSubcriteria).sort();
+  }, [activeFilters.criteria, approaches, filterOptions.subcriteria]);
 
-  const toggleSection = (section: string) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [section]: !prev[section as keyof typeof prev]
-    }));
-  };
-
-  const renderFilterSection = (
+  const renderCheckboxList = (
     title: string,
-    filterType: string,
-    options: FilterOption[],
-    selectedValues: string[]
-  ) => {
-    const isExpanded = expandedSections[filterType as keyof typeof expandedSections];
-
-    return (
-      <div className="filter-section">
-        <div
-          className="filter-section-header"
-          onClick={() => toggleSection(filterType)}
-        >
-          <h4>{title}</h4>
-          {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </div>
-
-        {isExpanded && (
-          <div className="filter-options">
-            {options.map(option => (
-              <label key={option.id} className="filter-option">
-                <input
-                  type="checkbox"
-                  checked={selectedValues.includes(option.id)}
-                  onChange={(e) => handleFilterChange(filterType, option.id, e.target.checked)}
-                  disabled={option.count === 0}
-                />
-                <span className="checkmark"></span>
-                <span className="option-text">
-                  {option.name}
-                  <span className="option-count">({option.count})</span>
-                </span>
-              </label>
-            ))}
+    filterType: keyof ActiveFilters,
+    options: string[]
+  ) => (
+    <div className="mb-4">
+      <h4 className="font-bold mb-2">{title}</h4>
+      <div className="max-h-48 overflow-y-auto pr-2">
+        {options.map((option) => (
+          <div key={option} className="flex items-center mb-1">
+            <input
+              type="checkbox"
+              id={`${filterType}-${option}`}
+              checked={activeFilters[filterType].includes(option)}
+              onChange={() => onFilterChange(filterType, option)}
+              className="ml-2"
+            />
+            <label htmlFor={`${filterType}-${option}`} className="text-sm">
+              {option}
+            </label>
           </div>
-        )}
+        ))}
       </div>
-    );
-  };
+    </div>
+  );
 
   return (
-    <div className="filter-panel">
-      <div className="filter-header">
-        <h3>فیلتر رویکردها</h3>
+    <aside className="w-64 bg-gray-50 p-4 rounded-lg shadow-md">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold">فیلترها</h3>
         <button
-          className="clear-filters-btn"
-          onClick={clearAllFilters}
-          title="حذف همه فیلترها"
+          onClick={onResetFilters}
+          className="text-sm text-blue-600 hover:text-blue-800"
         >
-          <X size={16} />
           حذف فیلتر
         </button>
       </div>
-
-      <div className="filter-content">
-        {renderFilterSection('معیار', 'criteria', criteriaOptions, filters.criteria)}
-        {renderFilterSection('زیرمعیار', 'subCriteria', subCriteriaOptions, filters.subCriteria)}
-        {renderFilterSection('استراتژی', 'strategies', strategiesOptions, filters.strategies)}
-        {renderFilterSection('اهداف راهبردی', 'strategicObjectives', objectivesOptions, filters.strategicObjectives)}
-        {renderFilterSection('فرایند', 'processes', processesOptions, filters.processes)}
-      </div>
-    </div>
+      <hr className="mb-4" />
+      
+      {renderCheckboxList('معیار', 'criteria', filterOptions.criteria)}
+      {renderCheckboxList('زیرمعیار', 'subcriteria', availableSubcriteria)}
+      {renderCheckboxList('استراتژی', 'strategies', filterOptions.strategies)}
+      {renderCheckboxList('اهداف راهبردی', 'strategicObjectives', filterOptions.strategicObjectives)}
+      {renderCheckboxList('فرایند', 'processes', filterOptions.processes)}
+    </aside>
   );
 };
 

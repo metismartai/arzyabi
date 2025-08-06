@@ -24,9 +24,9 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route path="/home" element={<Home />} />
             <Route index element={<Dashboard />} />
-            <Route path="approaches" element={<ApproachesList />} />
-            <Route path="approaches/:id" element={<ApproachDetail />} />
-            <Route path="/dashboard" element={ <Dashboard /> } />
+            <Route path="/approaches" element={<ApproachesList />} />
+            <Route path="/approaches/:code" element={<ApproachDetail />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/results" element={<div>Results Page</div>} />
             <Route path="/process" element={<div>Process Page</div>} />
             <Route path="/strategy" element={<div>Strategy Page</div>} />

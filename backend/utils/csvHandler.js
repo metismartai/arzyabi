@@ -1,213 +1,186 @@
+// // csvHandler.js
+// const fs = require('fs');
+// const path = require('path');
+// const csv = require('csv-parser');
+
+// const csvFilePath = path.join(__dirname, 'approaches.csv');
+// let approachesData = [];
+// let filterOptions = {};
+
+// // Helper function to split and trim values, returning an empty array if input is empty
+// const splitAndTrim = (str) => {
+//   if (!str || typeof str !== 'string') return [];
+//   return str.split('|').map(item => item.trim()).filter(Boolean); // filter(Boolean) removes empty strings
+// };
+
+// // Helper to extract unique values for filters
+// const getUniqueValues = (data, key, splitter = false) => {
+//   const valueSet = new Set();
+//   data.forEach(row => {
+//     const value = row[key];
+//     if (splitter && typeof value === 'string') {
+//       value.split('|').forEach(item => {
+//         if (item.trim()) valueSet.add(item.trim());
+//       });
+//     } else if (value) {
+//       valueSet.add(value);
+//     }
+//   });
+//   return Array.from(valueSet).sort();
+// };
+
+// const loadData = () => {
+//   return new Promise((resolve, reject) => {
+//     const results = [];
+//     fs.createReadStream(csvFilePath)
+//       .pipe(csv({ separator: ';' }))
+//       .on('data', (data) => {
+//         // Sanitize keys by removing BOM and extra spaces
+//         const sanitizedData = {};
+//         for (const key in data) {
+//           const cleanKey = key.replace(/^\uFEFF/, '').trim();
+//           sanitizedData[cleanKey] = data[key];
+//         }
+        
+//         // Create a structured object for each approach
+//         const structuredApproach = {
+//           criteria: sanitizedData['criteria'] || '',
+//           subcriteria: sanitizedData['subcriteria'] || '',
+//           code: sanitizedData['code'] || '',
+//           title: sanitizedData['title'] || '',
+//           evident_documents: sanitizedData['مصادیق مستندات'] || '',
+//           goal: sanitizedData['هدف رویکرد'] || '',
+//           processes: splitAndTrim(sanitizedData['processes']),
+//           strategies: splitAndTrim(sanitizedData['strategies']),
+//           strategicObjectives: splitAndTrim(sanitizedData['strategicObjectives']),
+//           indicators: splitAndTrim(sanitizedData['indicators']),
+//           implementation: sanitizedData['implementation'] || '',
+//           documents: sanitizedData['documents'] || '',
+//         };
+//         results.push(structuredApproach);
+//       })
+//       .on('end', () => {
+//         approachesData = results;
+//         console.log('CSV file successfully processed.');
+
+//         // Pre-calculate filter options
+//         filterOptions = {
+//           criteria: getUniqueValues(approachesData, 'criteria'),
+//           subcriteria: getUniqueValues(approachesData, 'subcriteria'),
+//           strategies: getUniqueValues(approachesData, 'strategies', true),
+//           strategicObjectives: getUniqueValues(approachesData, 'strategicObjectives', true),
+//           processes: getUniqueValues(approachesData, 'processes', true),
+//         };
+//         console.log('Filter options generated.');
+//         resolve();
+//       })
+//       .on('error', (error) => {
+//         console.error('Error loading CSV data:', error);
+//         reject(error);
+//       });
+//   });
+// };
+
+// const getApproaches = () => approachesData;
+// const getApproachByCode = (code) => approachesData.find(app => app.code === code);
+// const getFilterOptions = () => filterOptions;
+
+// module.exports = {
+//   loadData,
+//   getApproaches,
+//   getApproachByCode,
+//   getFilterOptions,
+// };
+
+
+// utils/csvHandler.js
 const fs = require('fs');
 const path = require('path');
+const csv = require('csv-parser');
 
-const DATA_DIR = path.join(__dirname, '../data');
+// CORRECTED PATH: Go up one level from 'utils' then into 'data'
+const csvFilePath = path.join(__dirname, '..', 'data', 'approaches.csv');
 
-const readCsvFile = (filename) => {
-  return new Promise((resolve, reject) => {
-    const filePath = path.join(DATA_DIR, `${filename}.csv`);
-    
-    if (!fs.existsSync(filePath)) {
-      reject(new Error(`File ${filename}.csv not found`));
-      return;
-    }
-    
-    try {
-      // خواندن کل فایل
-      const fileContent = fs.readFileSync(filePath, 'utf8');
-      
-      // حذف BOM اگر وجود دارد
-      const cleanContent = fileContent.replace(/^\uFEFF/, '');
-      
-      // تقسیم به خطوط
-      const lines = cleanContent.split('\n').filter(line => line.trim() !== '');
-      
-      if (lines.length === 0) {
-        resolve([]);
-        return;
-      }
-      
-      // استخراج headers از خط اول
-      const headerLine = lines[0].trim();
-      const headers = headerLine.split(';').map(header => header.trim().replace(/"/g, ''));
-      
-      console.log('Headers found:', headers);
-      
-      // پردازش سایر خطوط
-      const results = [];
-      
-      for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line === '') continue;
-        
-        // تقسیم خط بر اساس سمی‌کالن
-        const values = line.split(';').map(value => value.trim().replace(/"/g, ''));
-        
-        // ایجاد object از headers و values
-        const record = {};
-        headers.forEach((header, index) => {
-          record[header] = values[index] || '';
-        });
-        
-        results.push(record);
-      }
-      
-      console.log(`Successfully parsed ${results.length} records from ${filename}.csv`);
-      console.log('Sample record keys:', Object.keys(results[0] || {}));
-      
-      resolve(results);
-      
-    } catch (error) {
-      console.error(`Error reading ${filename}.csv:`, error);
-      reject(error);
-    }
-  });
+let approachesData = [];
+let filterOptions = {};
+
+const splitAndTrim = (str) => {
+  if (!str || typeof str !== 'string') return [];
+  return str.split('|').map(item => item.trim()).filter(Boolean);
 };
 
-// تابع برای دریافت ساختار ستون‌ها
-const getCsvStructure = (filename) => {
-  return new Promise((resolve, reject) => {
-    const filePath = path.join(DATA_DIR, `${filename}.csv`);
-    
-    if (!fs.existsSync(filePath)) {
-      reject(new Error(`File ${filename}.csv not found`));
-      return;
-    }
-    
-    try {
-      const fileContent = fs.readFileSync(filePath, 'utf8');
-      const cleanContent = fileContent.replace(/^\uFEFF/, '');
-      const firstLine = cleanContent.split('\n')[0];
-      const headers = firstLine.split(';').map(header => header.trim().replace(/"/g, ''));
-      
-      resolve(headers);
-    } catch (error) {
-      reject(error);
+const getUniqueValues = (data, key, isMultiValue = false) => {
+  const valueSet = new Set();
+  data.forEach(row => {
+    const value = row[key];
+    if (isMultiValue && Array.isArray(value)) {
+      value.forEach(item => valueSet.add(item));
+    } else if (!isMultiValue && value) {
+      valueSet.add(value);
     }
   });
+  return Array.from(valueSet).sort();
 };
 
-// تابع برای پردازش فایل‌های CSV پیچیده‌تر (اگر نیاز باشد)
-const readCsvFileAdvanced = (filename) => {
+const loadData = () => {
   return new Promise((resolve, reject) => {
-    const filePath = path.join(DATA_DIR, `${filename}.csv`);
-    
-    if (!fs.existsSync(filePath)) {
-      reject(new Error(`File ${filename}.csv not found`));
-      return;
+    if (!fs.existsSync(csvFilePath)) {
+        return reject(new Error(`CSV file not found at path: ${csvFilePath}`));
     }
-    
-    try {
-      const fileContent = fs.readFileSync(filePath, 'utf8');
-      const cleanContent = fileContent.replace(/^\uFEFF/, '');
-      
-      // پردازش پیشرفته‌تر برای مدیریت کوتیشن‌های تو در تو
-      const lines = [];
-      let currentLine = '';
-      let insideQuotes = false;
-      
-      for (let i = 0; i < cleanContent.length; i++) {
-        const char = cleanContent[i];
-        
-        if (char === '"') {
-          insideQuotes = !insideQuotes;
-        } else if (char === '\n' && !insideQuotes) {
-          if (currentLine.trim() !== '') {
-            lines.push(currentLine.trim());
-          }
-          currentLine = '';
-          continue;
+    const results = [];
+    fs.createReadStream(csvFilePath)
+      .pipe(csv({ separator: ';' }))
+      .on('data', (data) => {
+        const sanitizedData = {};
+        for (const key in data) {
+          const cleanKey = key.replace(/^\uFEFF/, '').trim();
+          sanitizedData[cleanKey] = data[key];
         }
         
-        currentLine += char;
-      }
-      
-      // اضافه کردن آخرین خط
-      if (currentLine.trim() !== '') {
-        lines.push(currentLine.trim());
-      }
-      
-      if (lines.length === 0) {
-        resolve([]);
-        return;
-      }
-      
-      // استخراج headers
-      const headerLine = lines[0];
-      const headers = parseCSVLine(headerLine);
-      
-      console.log('Headers found:', headers);
-      
-      // پردازش داده‌ها
-      const results = [];
-      
-      for (let i = 1; i < lines.length; i++) {
-        const line = lines[i];
-        if (line === '') continue;
-        
-        const values = parseCSVLine(line);
-        
-        const record = {};
-        headers.forEach((header, index) => {
-          record[header] = values[index] || '';
-        });
-        
-        results.push(record);
-      }
-      
-      resolve(results);
-      
-    } catch (error) {
-      reject(error);
-    }
+        const structuredApproach = {
+          criteria: sanitizedData['criteria'] || '',
+          subcriteria: sanitizedData['subcriteria'] || '',
+          code: sanitizedData['code'] || '',
+          title: sanitizedData['title'] || '',
+          evident_documents: sanitizedData['مصادیق مستندات'] || '',
+          goal: sanitizedData['هدف رویکرد'] || '',
+          processes: splitAndTrim(sanitizedData['processes']),
+          strategies: splitAndTrim(sanitizedData['strategies']),
+          strategicObjectives: splitAndTrim(sanitizedData['strategicObjectives']),
+          indicators: splitAndTrim(sanitizedData['indicators']),
+          implementation: sanitizedData['implementation'] || '',
+          documents: sanitizedData['documents'] || '',
+        };
+        results.push(structuredApproach);
+      })
+      .on('end', () => {
+        approachesData = results;
+        console.log('CSV file successfully processed.');
+
+        filterOptions = {
+          criteria: getUniqueValues(approachesData, 'criteria'),
+          subcriteria: getUniqueValues(approachesData, 'subcriteria'),
+          strategies: getUniqueValues(approachesData, 'strategies', true),
+          strategicObjectives: getUniqueValues(approachesData, 'strategicObjectives', true),
+          processes: getUniqueValues(approachesData, 'processes', true),
+        };
+        console.log('Filter options generated.');
+        resolve();
+      })
+      .on('error', (error) => {
+        console.error('Error loading CSV data:', error);
+        reject(error);
+      });
   });
 };
 
-// تابع کمکی برای پردازش خط CSV
-const parseCSVLine = (line) => {
-  const result = [];
-  let current = '';
-  let insideQuotes = false;
-  
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    
-    if (char === '"') {
-      insideQuotes = !insideQuotes;
-    } else if (char === ';' && !insideQuotes) {
-      result.push(current.trim());
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  
-  // اضافه کردن آخرین مقدار
-  result.push(current.trim());
-  
-  return result;
-};
-
-const getAllCsvFiles = () => {
-  return new Promise((resolve, reject) => {
-    fs.readdir(DATA_DIR, (err, files) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      
-      const csvFiles = files
-        .filter(file => file.endsWith('.csv'))
-        .map(file => file.replace('.csv', ''));
-      
-      resolve(csvFiles);
-    });
-  });
-};
+const getApproaches = () => approachesData;
+const getApproachByCode = (code) => approachesData.find(app => app.code === code);
+const getFilterOptions = () => filterOptions;
 
 module.exports = {
-  readCsvFile,
-  readCsvFileAdvanced,
-  getAllCsvFiles,
-  getCsvStructure
+  loadData,
+  getApproaches,
+  getApproachByCode,
+  getFilterOptions,
 };

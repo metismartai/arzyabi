@@ -1,90 +1,57 @@
+// src/components/Approaches/ApproachCard.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Target, Settings, TrendingUp, BarChart3, FileText } from 'lucide-react';
-import './ApproacheCard.css';
 
-interface ApproachCardProps {
-  approach: {
-    id: string;
-    code: string;
-    title: string;
-    objective: string;
-    implementation: string;
-    strategies: string[];
-    processes: string[];
-    strategic_objectives: string[];
-    indicators_count: number;
-    documents_count: number;
-  };
-  viewMode: 'list' | 'grid';
+interface Approach {
+  code: string;
+  title: string;
+  goal: string;
+  implementation: string;
+  strategies: string[];
+  processes: string[];
+  strategicObjectives: string[];
+  indicators: string[];
+  evident_documents: string;
 }
 
-const ApproachCard: React.FC<ApproachCardProps> = ({ approach, viewMode }) => {
+interface Props {
+  approach: Approach;
+}
+
+const ApproachCard: React.FC<Props> = ({ approach }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate(`/approaches/${approach.id}`);
-  };
-
-  const truncateText = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+    navigate(`/approaches/${approach.code}`);
   };
 
   return (
     <div 
-      className={`approach-card ${viewMode}`}
       onClick={handleCardClick}
+      className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow cursor-pointer border border-gray-200 flex flex-col justify-between h-full"
     >
-      {/* هدر کارت */}
-      <div className="card-header">
-        <h3 className="approach-title">{approach.title}</h3>
-        <span className="approach-code">{approach.code}</span>
-      </div>
-
-      {/* هدف رویکرد */}
-      <div className="approach-objective">
-        <p>{approach.objective}</p>
-      </div>
-
-      <div className="card-divider"></div>
-
-      {/* جاری‌سازی */}
-      <div className="approach-implementation">
-        <p>{truncateText(approach.implementation, viewMode === 'grid' ? 100 : 200)}</p>
-      </div>
-
-      {/* آمار و اطلاعات */}
-      <div className="approach-stats">
-        <div className="stat-item">
-          <Target className="stat-icon" size={16} />
-          <span>استراتژی‌ها: {approach.strategies.length}</span>
+      <div>
+        <div className="flex justify-between items-start mb-2">
+          <span className="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">{approach.code}</span>
+          <h3 className="text-center font-bold text-lg flex-grow mx-4">{approach.title}</h3>
         </div>
-        
-        <div className="stat-item">
-          <Settings className="stat-icon" size={16} />
-          <span>فرایندها: {approach.processes.length}</span>
-        </div>
-        
-        <div className="stat-item">
-          <TrendingUp className="stat-icon" size={16} />
-          <span>اهداف راهبردی: {approach.strategic_objectives.length}</span>
-        </div>
-        
-        <div className="stat-item">
-          <BarChart3 className="stat-icon" size={16} />
-          <span>شاخص‌ها: {approach.indicators_count}</span>
-        </div>
-        
-        <div className="stat-item">
-          <FileText className="stat-icon" size={16} />
-          <span>مستندات: {approach.documents_count}</span>
+        <p className="text-gray-600 text-sm mb-3 text-center italic">"{approach.goal}"</p>
+        <hr className="my-3" />
+        <div>
+          <p className="text-sm text-gray-800" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {approach.implementation}
+          </p>
         </div>
       </div>
-
-      {/* فوتر کارت */}
-      <div className="card-footer">
-        <span className="view-details">جهت مشاهده کامل کلیک کنید</span>
+      <div>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-gray-700 mt-4 pt-2 border-t">
+          <span>استراتژی‌ها: <strong>{approach.strategies.length}</strong></span>
+          <span>فرایندها: <strong>{approach.processes.length}</strong></span>
+          <span>اهداف راهبردی: <strong>{approach.strategicObjectives.length}</strong></span>
+          <span>شاخص‌ها: <strong>{approach.indicators.length}</strong></span>
+          <span className="col-span-2">مصادیق مستندات: <strong>{approach.evident_documents.length > 0 ? 1 : 0}</strong></span>
+        </div>
+        <p className="text-center text-xs text-blue-500 mt-4">جهت مشاهده کامل کلیک کنید</p>
       </div>
     </div>
   );

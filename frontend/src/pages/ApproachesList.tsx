@@ -1,291 +1,197 @@
+// src/components/Approaches/ApproachesList.tsx
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Grid, List, Table, RefreshCw, Filter } from 'lucide-react';
+import axios from 'axios';
 import FilterPanel from '../components/Approaches/FilterPanel';
 import ApproachCard from '../components/Approaches/ApproachCard';
 import ApproachTable from '../components/Approaches/ApproachTable';
-import './ApproachesList.css';
 
-// انواع نمایش
-type ViewMode = 'list' | 'grid' | 'table';
-
-// نوع داده رویکرد
+// Define types
+// (These should ideally be in a separate types.ts file)
 interface Approach {
-  id: string;
   code: string;
   title: string;
-  objective: string;
+  goal: string;
   implementation: string;
-  criterion_id: string;
-  sub_criterion_id: string;
   strategies: string[];
   processes: string[];
-  strategic_objectives: string[];
-  indicators_count: number;
-  documents_count: number;
+  strategicObjectives: string[];
+  indicators: string[];
+  evident_documents: string;
+  criteria: string;
+  subcriteria: string;
 }
 
-// نوع فیلترها
-interface Filters {
+interface FilterOptions {
   criteria: string[];
-  subCriteria: string[];
+  subcriteria: string[];
   strategies: string[];
   strategicObjectives: string[];
   processes: string[];
 }
 
+interface ActiveFilters {
+  criteria: string[];
+  subcriteria: string[];
+  strategies: string[];
+  strategicObjectives: string[];
+  processes: string[];
+}
+
+const initialFilters: ActiveFilters = {
+  criteria: [],
+  subcriteria: [],
+  strategies: [],
+  strategicObjectives: [],
+  processes: [],
+};
+
+type ViewMode = 'grid' | 'list' | 'table';
+
 const ApproachesList: React.FC = () => {
-  // State ها
-  const [approaches, setApproaches] = useState<Approach[]>([]);
-  const [filteredApproaches, setFilteredApproaches] = useState<Approach[]>([]);
+  const [allApproaches, setAllApproaches] = useState<Approach[]>([]);
+  const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null);
+  const [activeFilters, setActiveFilters] = useState<ActiveFilters>(initialFilters);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [filters, setFilters] = useState<Filters>({
-    criteria: [],
-    subCriteria: [],
-    strategies: [],
-    strategicObjectives: [],
-    processes: []
-  });
-  const [showFilters, setShowFilters] = useState(true);
 
-  // بارگذاری داده‌ها از API
   useEffect(() => {
-    fetchApproaches();
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [approachesRes, filtersRes] = await Promise.all([
+          axios.get('http://localhost:5000/api/approaches'),
+          axios.get('http://localhost:5000/api/filters'),
+        ]);
+        setAllApproaches(approachesRes.data);
+        setFilterOptions(filtersRes.data);
+        setError(null);
+        console.log('data received', filtersRes.data);
+      } catch (err) {
+        console.error('Failed to fetch data:', err);
+        setError('خطا در دریافت اطلاعات از سرور.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
-  const fetchApproaches = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/approaches');
-      if (!response.ok) throw new Error('خطا در بارگذاری رویکردها');
-      const data = await response.json();
-      // این خط را اضافه کنید
-      if (!Array.isArray(data)) {
-        throw new Error("فرمت داده‌های دریافتی برای رویکردها صحیح نیست.");
-      }
-      setApproaches(data);
-      setFilteredApproaches(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'خطای نامشخص');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // فیلتر کردن رویکردها
-  const filteredAndSearchedApproaches = useMemo(() => {
-    let result = [...approaches];
-
-    // اعمال فیلترها
-    if (filters.criteria.length > 0) {
-      result = result.filter(approach =>
-        filters.criteria.includes(approach.criterion_id)
-      );
-    }
-
-    if (filters.subCriteria.length > 0) {
-      result = result.filter(approach =>
-        filters.subCriteria.includes(approach.sub_criterion_id)
-      );
-    }
-
-    if (filters.strategies.length > 0) {
-      result = result.filter(approach =>
-        approach.strategies.some(strategy => filters.strategies.includes(strategy))
-      );
-    }
-
-    if (filters.strategicObjectives.length > 0) {
-      result = result.filter(approach =>
-        approach.strategic_objectives.some(obj => filters.strategicObjectives.includes(obj))
-      );
-    }
-
-    if (filters.processes.length > 0) {
-      result = result.filter(approach =>
-        approach.processes.some(process => filters.processes.includes(process))
-      );
-    }
-
-    // اعمال جستجو
-    if (searchTerm.trim()) {
-      const searchLower = searchTerm.toLowerCase();
-      result = result.filter(approach =>
-        approach.title.toLowerCase().includes(searchLower) ||
-        approach.objective.toLowerCase().includes(searchLower) ||
-        approach.implementation.toLowerCase().includes(searchLower) ||
-        approach.code.toLowerCase().includes(searchLower)
-      );
-    }
-
-    return result;
-  }, [approaches, filters, searchTerm]);
-
-  // حذف همه فیلترها
-  const clearAllFilters = () => {
-    setFilters({
-      criteria: [],
-      subCriteria: [],
-      strategies: [],
-      strategicObjectives: [],
-      processes: []
+  const handleFilterChange = (filterType: keyof ActiveFilters, value: string) => {
+    setActiveFilters(prev => {
+      const currentValues = prev[filterType];
+      const newValues = currentValues.includes(value)
+        ? currentValues.filter(v => v !== value)
+        : [...currentValues, value];
+      return { ...prev, [filterType]: newValues };
     });
-    setSearchTerm('');
+  };
+  
+  const resetAll = () => {
+    setActiveFilters(initialFilters);
+    setSearchQuery('');
   };
 
-  // رندر محتوای اصلی
-  const renderContent = () => {
-    if (loading) {
-      return (
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>در حال بارگذاری رویکردها...</p>
-        </div>
-      );
-    }
+  const filteredApproaches = useMemo(() => {
+    return allApproaches.filter(app => {
+      // Search Query Filter
+      const searchLower = searchQuery.toLowerCase();
+      const matchesSearch =
+        searchQuery === '' ||
+        app.title.toLowerCase().includes(searchLower) ||
+        app.goal.toLowerCase().includes(searchLower) ||
+        app.code.toLowerCase().includes(searchLower) ||
+        app.implementation.toLowerCase().includes(searchLower);
+        
+      if (!matchesSearch) return false;
 
-    if (error) {
-      return (
-        <div className="error-container">
-          <p className="error-message">{error}</p>
-          <button onClick={fetchApproaches} className="retry-btn">
-            <RefreshCw size={16} />
-            تلاش مجدد
-          </button>
-        </div>
-      );
-    }
+      // Checkbox Filters (AND logic)
+      const matchesCriteria = activeFilters.criteria.length === 0 || activeFilters.criteria.includes(app.criteria);
+      const matchesSubcriteria = activeFilters.subcriteria.length === 0 || activeFilters.subcriteria.includes(app.subcriteria);
+      
+      const matchesStrategies = activeFilters.strategies.length === 0 || activeFilters.strategies.every(s => app.strategies.includes(s));
+      const matchesProcesses = activeFilters.processes.length === 0 || activeFilters.processes.every(p => app.processes.includes(p));
+      const matchesObjectives = activeFilters.strategicObjectives.length === 0 || activeFilters.strategicObjectives.every(o => app.strategicObjectives.includes(o));
 
-    if (filteredAndSearchedApproaches.length === 0) {
-      return (
-        <div className="empty-state">
-          <p>هیچ رویکردی یافت نشد</p>
-          <button onClick={clearAllFilters} className="clear-filters-btn">
-            حذف فیلترها
-          </button>
-        </div>
-      );
-    }
+      return matchesCriteria && matchesSubcriteria && matchesStrategies && matchesProcesses && matchesObjectives;
+    });
+  }, [allApproaches, activeFilters, searchQuery]);
 
-    // نمایش بر اساس حالت انتخابی
-    switch (viewMode) {
-      case 'table':
-        return <ApproachTable approaches={filteredAndSearchedApproaches} />;
-      case 'list':
-        return (
-          <div className="approaches-list-view">
-            {filteredAndSearchedApproaches.map(approach => (
-              <ApproachCard
-                key={approach.id}
-                approach={approach}
-                viewMode="list"
-              />
-            ))}
-          </div>
-        );
-      case 'grid':
-      default:
-        return (
-          <div className="approaches-grid-view">
-            {filteredAndSearchedApproaches.map(approach => (
-              <ApproachCard
-                key={approach.id}
-                approach={approach}
-                viewMode="grid"
-              />
-            ))}
-          </div>
-        );
-    }
-  };
+  if (loading) return <div className="text-center p-10">در حال بارگذاری...</div>;
+  if (error) return <div className="text-center p-10 text-red-500">{error}</div>;
 
   return (
-    <div className="approaches-page">
-      {/* سایدبار فیلتر */}
-      <div className={`filter-sidebar ${!showFilters ? 'hidden' : ''}`}>
-        <FilterPanel
-          filters={filters}
-          onFiltersChange={setFilters}
-          approaches={approaches}
+    <div className="p-4 sm:p-6 lg:p-8 bg-gray-100 min-h-screen">
+      <header className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-800">مدیریت رویکردها</h1>
+      </header>
+
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Filter Panel */}
+        <div className="lg:w-1/4 xl:w-1/5">
+          <FilterPanel
+        
+          filterOptions={filterOptions}
+          activeFilters={activeFilters}
+          onFilterChange={handleFilterChange}
+          onResetFilters={resetAll}
+          approaches={allApproaches} // Pass all approaches for cascading logic
         />
-      </div>
+        </div>
 
-      {/* محتوای اصلی */}
-      <div className={`main-content ${!showFilters ? 'full-width' : ''}`}>
-        {/* هدر صفحه */}
-        <div className="page-header">
-          <h1>مدیریت رویکردها</h1>
-
-          {/* نوار ابزار */}
-          <div className="toolbar">
-            {/* دکمه نمایش/پنهان کردن فیلتر */}
-            <button
-              className="filter-toggle-btn"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <Filter size={16} />
-              {showFilters ? 'پنهان کردن فیلتر' : 'نمایش فیلتر'}
-            </button>
-
-            {/* جستجو */}
-            <div className="search-container">
-              <Search className="search-icon" size={16} />
+        {/* Main Content */}
+        <main className="flex-1">
+          {/* Header Bar */}
+          <div className="bg-white p-3 rounded-lg shadow-md mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex-grow sm:flex-grow-0">
               <input
                 type="text"
                 placeholder="جستجو در رویکردها..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full sm:w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-
-            {/* تعداد نتایج */}
-            <div className="results-count">
-              {filteredAndSearchedApproaches.length} از {approaches.length} رویکرد
+            <div className="text-sm text-gray-600">
+              نمایش {filteredApproaches.length} از کل {allApproaches.length} رویکرد
             </div>
-
-            {/* حالت‌های نمایش */}
-            <div className="view-modes">
-              <button
-                className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-                onClick={() => setViewMode('list')}
-                title="نمایش لیستی"
-              >
-                <List size={16} />
-              </button>
-              <button
-                className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                onClick={() => setViewMode('grid')}
-                title="نمایش شبکه‌ای"
-              >
-                <Grid size={16} />
-              </button>
-              <button
-                className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
-                onClick={() => setViewMode('table')}
-                title="نمایش جدولی"
-              >
-                <Table size={16} />
-              </button>
+            <div className="flex items-center gap-2">
+              <span className="text-sm">نمایش:</span>
+              <button onClick={() => setViewMode('grid')} className={`p-2 rounded ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>شبکه‌ای</button>
+              <button onClick={() => setViewMode('list')} className={`p-2 rounded ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>لیستی</button>
+              <button onClick={() => setViewMode('table')} className={`p-2 rounded ${viewMode === 'table' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>جدولی</button>
             </div>
-
-            {/* دکمه نمایش همه */}
             <button
-              className="show-all-btn"
-              onClick={clearAllFilters}
+              onClick={resetAll}
+              className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700"
             >
-              <RefreshCw size={16} />
               کل رویکردها
             </button>
           </div>
-        </div>
 
-        {/* محتوای رویکردها */}
-        <div className="approaches-content">
-          {renderContent()}
-        </div>
+          {/* Approaches Display */}
+          {filteredApproaches.length > 0 ? (
+            viewMode === 'table' ? (
+              <ApproachTable approaches={filteredApproaches} />
+            ) : (
+              <div
+                className={`grid gap-6 ${
+                  viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4' : 'grid-cols-1'
+                }`}
+              >
+                {filteredApproaches.map((approach) => (
+                  <ApproachCard key={approach.code} approach={approach} />
+                ))}
+              </div>
+            )
+          ) : (
+            <div className="text-center p-10 bg-white rounded-lg shadow">
+              <h3 className="text-xl font-semibold">هیچ رویکردی یافت نشد!</h3>
+              <p className="text-gray-500 mt-2">لطفاً فیلترها یا عبارت جستجوی خود را تغییر دهید.</p>
+            </div>
+          )}
+        </main>
       </div>
     </div>
   );
