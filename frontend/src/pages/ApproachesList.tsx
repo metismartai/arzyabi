@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Grid, List, Table, RefreshCw, Filter } from 'lucide-react';
 import FilterPanel from '../components/Approaches/FilterPanel';
 import ApproachCard from '../components/Approaches/ApproachCard';
-import ApproachTable from '../components/Approaches/ApproacheTable';
+import ApproachTable from '../components/Approaches/ApproachTable';
 import './ApproachesList.css';
 
 // انواع نمایش
@@ -61,6 +61,10 @@ const ApproachesList: React.FC = () => {
       const response = await fetch('/api/approaches');
       if (!response.ok) throw new Error('خطا در بارگذاری رویکردها');
       const data = await response.json();
+      // این خط را اضافه کنید
+      if (!Array.isArray(data)) {
+        throw new Error("فرمت داده‌های دریافتی برای رویکردها صحیح نیست.");
+      }
       setApproaches(data);
       setFilteredApproaches(data);
     } catch (err) {
@@ -76,31 +80,31 @@ const ApproachesList: React.FC = () => {
 
     // اعمال فیلترها
     if (filters.criteria.length > 0) {
-      result = result.filter(approach => 
+      result = result.filter(approach =>
         filters.criteria.includes(approach.criterion_id)
       );
     }
 
     if (filters.subCriteria.length > 0) {
-      result = result.filter(approach => 
+      result = result.filter(approach =>
         filters.subCriteria.includes(approach.sub_criterion_id)
       );
     }
 
     if (filters.strategies.length > 0) {
-      result = result.filter(approach => 
+      result = result.filter(approach =>
         approach.strategies.some(strategy => filters.strategies.includes(strategy))
       );
     }
 
     if (filters.strategicObjectives.length > 0) {
-      result = result.filter(approach => 
+      result = result.filter(approach =>
         approach.strategic_objectives.some(obj => filters.strategicObjectives.includes(obj))
       );
     }
 
     if (filters.processes.length > 0) {
-      result = result.filter(approach => 
+      result = result.filter(approach =>
         approach.processes.some(process => filters.processes.includes(process))
       );
     }
@@ -173,9 +177,9 @@ const ApproachesList: React.FC = () => {
         return (
           <div className="approaches-list-view">
             {filteredAndSearchedApproaches.map(approach => (
-              <ApproachCard 
-                key={approach.id} 
-                approach={approach} 
+              <ApproachCard
+                key={approach.id}
+                approach={approach}
                 viewMode="list"
               />
             ))}
@@ -186,9 +190,9 @@ const ApproachesList: React.FC = () => {
         return (
           <div className="approaches-grid-view">
             {filteredAndSearchedApproaches.map(approach => (
-              <ApproachCard 
-                key={approach.id} 
-                approach={approach} 
+              <ApproachCard
+                key={approach.id}
+                approach={approach}
                 viewMode="grid"
               />
             ))}
@@ -201,7 +205,7 @@ const ApproachesList: React.FC = () => {
     <div className="approaches-page">
       {/* سایدبار فیلتر */}
       <div className={`filter-sidebar ${!showFilters ? 'hidden' : ''}`}>
-        <FilterPanel 
+        <FilterPanel
           filters={filters}
           onFiltersChange={setFilters}
           approaches={approaches}
@@ -213,11 +217,11 @@ const ApproachesList: React.FC = () => {
         {/* هدر صفحه */}
         <div className="page-header">
           <h1>مدیریت رویکردها</h1>
-          
+
           {/* نوار ابزار */}
           <div className="toolbar">
             {/* دکمه نمایش/پنهان کردن فیلتر */}
-            <button 
+            <button
               className="filter-toggle-btn"
               onClick={() => setShowFilters(!showFilters)}
             >
@@ -268,7 +272,7 @@ const ApproachesList: React.FC = () => {
             </div>
 
             {/* دکمه نمایش همه */}
-            <button 
+            <button
               className="show-all-btn"
               onClick={clearAllFilters}
             >

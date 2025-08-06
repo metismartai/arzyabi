@@ -51,24 +51,86 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     updateFilterOptions();
   }, [filters, approaches]);
 
+  // const fetchFilterOptions = async () => {
+  //   try {
+  //     // بارگذاری معیارها
+  //     const criteriaRes = await fetch('/api/approaches/values/criteria');
+  //     if (!criteriaRes.ok) {
+  //       console.error('درخواست برای معیارها با شکست مواجه شد');
+  //       setCriteriaOptions([]); // در صورت خطا، با آرایه خالی مقداردهی کنید
+  //       return; // از ادامه تابع خارج شوید
+  //     }
+  //     const criteria = await criteriaRes.json();
+
+  //   // این خط را اضافه کنید تا ساختار واقعی داده را ببینیم
+  //   console.log('Data received for criteria:', criteria); 
+
+
+
+  //   if (Array.isArray(criteria)) {
+  //     setCriteriaOptions(criteria.map((c: any) => ({
+  //       id: c.id,
+  //       name: c.name,
+  //       count: 0
+  //     })));
+  //   }else {
+  //             console.error("فرمت داده‌های دریافتی برای معیارها صحیح نیست.");
+  //       setCriteriaOptions([]); // اطمینان از اینکه state یک آرایه باقی می‌ماند
+  //   }
+  //     // بارگذاری سایر گزینه‌ها...
+  //     // (کد مشابه برای سایر فیلترها)
+
+  //   } catch (error) {
+  //     console.error('خطا در بارگذاری گزینه‌های فیلتر:', error);
+  //   }
+  // };
+
+  // در فایل src/components/Approaches/FilterPanel.tsx
+
   const fetchFilterOptions = async () => {
     try {
-      // بارگذاری معیارها
-      const criteriaRes = await fetch('/api/criteria');
-      const criteria = await criteriaRes.json();
-      setCriteriaOptions(criteria.map((c: any) => ({
-        id: c.id,
-        name: c.name,
-        count: 0
-      })));
+      const criteriaRes = await fetch('/api/approaches/values/criteria');
+      if (!criteriaRes.ok) {
+        console.error('درخواست برای معیارها با شکست مواجه شد');
+        setCriteriaOptions([]);
+        return;
+      }
+      // نام متغیر را به responseData تغییر می‌دهیم تا خواناتر باشد
+      const responseData = await criteriaRes.json();
+      console.log('Data received for criteria:', responseData); // این خط برای دیباگ عالی است
 
-      // بارگذاری سایر گزینه‌ها...
-      // (کد مشابه برای سایر فیلترها)
-      
+      // 1. لیست معیارها را از داخل آبجکت پاسخ استخراج می‌کنیم
+      const criteriaList = responseData.values;
+
+      // 2. بررسی می‌کنیم که آیا criteriaList واقعاً یک آرایه است
+      if (Array.isArray(criteriaList)) {
+
+        // 3. چون criteriaList آرایه‌ای از رشته‌هاست،
+        // ما باید خودمان آبجکت مورد نیاز را بسازیم.
+        const formattedCriteria = criteriaList.map((criterionName: string, index: number) => ({
+          // از ایندکس آرایه به عنوان یک id موقت استفاده می‌کنیم
+          id: (index + 1).toString(),
+          // خود رشته را به عنوان نام معیار قرار می‌دهیم
+          name: criterionName,
+          count: 0 // این را مثل قبل نگه می‌داریم
+        }));
+
+        setCriteriaOptions(formattedCriteria);
+
+      } else {
+        console.error("فرمت داده‌های دریافتی برای معیارها صحیح نیست (responseData.values یک آرایه نیست).");
+        setCriteriaOptions([]);
+      }
+
     } catch (error) {
       console.error('خطا در بارگذاری گزینه‌های فیلتر:', error);
+      setCriteriaOptions([]);
     }
   };
+
+
+
+
 
   const updateFilterOptions = () => {
     // به‌روزرسانی تعداد هر گزینه بر اساس رویکردهای فیلتر شده
@@ -77,14 +139,14 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 
   const handleFilterChange = (filterType: string, value: string, checked: boolean) => {
     const newFilters = { ...filters };
-    
+
     if (checked) {
       newFilters[filterType as keyof typeof filters].push(value);
     } else {
-      newFilters[filterType as keyof typeof filters] = 
+      newFilters[filterType as keyof typeof filters] =
         newFilters[filterType as keyof typeof filters].filter((item: string) => item !== value);
     }
-    
+
     onFiltersChange(newFilters);
   };
 
@@ -112,17 +174,17 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     selectedValues: string[]
   ) => {
     const isExpanded = expandedSections[filterType as keyof typeof expandedSections];
-    
+
     return (
       <div className="filter-section">
-        <div 
+        <div
           className="filter-section-header"
           onClick={() => toggleSection(filterType)}
         >
           <h4>{title}</h4>
           {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </div>
-        
+
         {isExpanded && (
           <div className="filter-options">
             {options.map(option => (
@@ -150,7 +212,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     <div className="filter-panel">
       <div className="filter-header">
         <h3>فیلتر رویکردها</h3>
-        <button 
+        <button
           className="clear-filters-btn"
           onClick={clearAllFilters}
           title="حذف همه فیلترها"
