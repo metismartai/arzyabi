@@ -23,6 +23,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route path="/home" element={<Home />} />
+            <Route path="/homepage" element={<HomePage />} />
             <Route index element={<Dashboard />} />
             <Route path="/approaches" element={<ApproachesList />} />
             <Route path="/approaches/:code" element={<ApproachDetail />} />

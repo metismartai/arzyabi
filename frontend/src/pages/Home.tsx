@@ -8,7 +8,6 @@ import './Home.css';
 // آیکون‌های مورد نیاز
 import { 
   BarChart3, 
-  Route, 
   TrendingUp, 
   Settings, 
   Target, 
@@ -89,7 +88,7 @@ const navigationBoxes: NavigationBoxData[] = [
     id: 'approaches',
     title: 'رویکردها',
     description: 'مدیریت رویکردهای بهبود',
-    icon: Route,
+    icon: BarChart3,
     color: 'var(--secondary)',
     path: '/approaches'
   },
