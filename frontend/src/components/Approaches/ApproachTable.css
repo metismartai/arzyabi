@@ -1,0 +1,225 @@
+/* ApproachTable.css */
+.approach-table-container {
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.approach-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+/* هدر جدول */
+.approach-table thead {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.approach-table th {
+  padding: 16px 12px;
+  text-align: right;
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  position: relative;
+}
+
+.approach-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.approach-table th.sortable:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.approach-table th.sortable span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.approach-table th.actions-column {
+  width: 80px;
+  text-align: center;
+}
+
+/* ردیف‌های جدول */
+.approach-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+  transition: all 0.2s;
+}
+
+.approach-table tbody tr:hover {
+  background: #f7fafc;
+  cursor: pointer;
+}
+
+.approach-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.approach-table td {
+  padding: 16px 12px;
+  vertical-align: top;
+}
+
+/* ستون کد */
+.code-cell {
+  width: 120px;
+}
+
+.code-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* ستون عنوان */
+.title-cell {
+  min-width: 200px;
+  max-width: 250px;
+}
+
+.title-content h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  line-height: 1.4;
+}
+
+/* ستون هدف */
+.objective-cell {
+  max-width: 300px;
+}
+
+.objective-cell p {
+  margin: 0;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+/* ستون جاری‌سازی */
+.implementation-cell {
+  max-width: 300px;
+}
+
+.implementation-cell p {
+  margin: 0;
+  color: #718096;
+  line-height: 1.5;
+}
+
+/* ستون عملیات */
+.actions-cell {
+  width: 80px;
+  text-align: center;
+}
+
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-btn:hover {
+  background: #2c5aa0;
+  transform: scale(1.05);
+}
+
+/* حالت خالی */
+.empty-table {
+  padding: 60px 20px;
+  text-align: center;
+  color: #4a5568;
+  background: #f7fafc;
+}
+
+.empty-table p {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* انیمیشن بارگذاری ردیف‌ها */
+@keyframes fadeInRow {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.table-row {
+  animation: fadeInRow 0.3s ease-out;
+}
+
+.table-row:nth-child(even) {
+  animation-delay: 0.1s;
+}
+
+.table-row:nth-child(odd) {
+  animation-delay: 0.2s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .approach-table {
+    font-size: 12px;
+  }
+  
+  .approach-table th,
+  .approach-table td {
+    padding: 12px 8px;
+  }
+  
+  .title-cell {
+    min-width: 150px;
+    max-width: 180px;
+  }
+  
+  .objective-cell,
+  .implementation-cell {
+    max-width: 200px;
+  }
+  
+  .title-content h4 {
+    font-size: 13px;
+  }
+}
+
+/* اسکرول افقی در موبایل */
+@media (max-width: 640px) {
+  .table-wrapper {
+    border-radius: 8px;
+  }
+  
+  .approach-table {
+    min-width: 700px;
+  }
+}

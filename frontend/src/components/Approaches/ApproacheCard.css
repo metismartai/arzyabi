@@ -1,0 +1,217 @@
+/* ApproachCard.css */
+.approach-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.approach-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-color: #3182ce;
+}
+
+.approach-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #3182ce 0%, #63b3ed 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.approach-card:hover::before {
+  opacity: 1;
+}
+
+/* هدر کارت */
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.approach-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.approach-code {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* هدف رویکرد */
+.approach-objective {
+  margin-bottom: 16px;
+}
+
+.approach-objective p {
+  color: #4a5568;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* جداکننده */
+.card-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #e2e8f0 50%, transparent 100%);
+  margin: 16px 0;
+}
+
+/* جاری‌سازی */
+.approach-implementation {
+  margin-bottom: 20px;
+}
+
+.approach-implementation p {
+  color: #718096;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* آمار */
+.approach-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #4a5568;
+}
+
+.stat-icon {
+  color: #3182ce;
+  flex-shrink: 0;
+}
+
+/* فوتر کارت */
+.card-footer {
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid #f7fafc;
+}
+
+.view-details {
+  font-size: 12px;
+  color: #3182ce;
+  font-weight: 500;
+}
+
+/* حالت لیستی */
+.approach-card.list {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 20px;
+}
+
+.approach-card.list .card-header {
+  margin-bottom: 0;
+  min-width: 250px;
+}
+
+.approach-card.list .approach-objective {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.approach-card.list .card-divider {
+  display: none;
+}
+
+.approach-card.list .approach-implementation {
+  margin-bottom: 0;
+  max-width: 300px;
+}
+
+.approach-card.list .approach-stats {
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+  min-width: 200px;
+}
+
+.approach-card.list .card-footer {
+  display: none;
+}
+
+.approach-card.list::before {
+  width: 100%;
+  height: 3px;
+  top: 0;
+  right: 0;
+}
+
+/* انیمیشن‌ها */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.approach-card {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .approach-card.list {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .approach-card.list .card-header {
+    min-width: auto;
+  }
+  
+  .approach-card.list .approach-implementation {
+    max-width: none;
+  }
+  
+  .approach-card.list .approach-stats {
+    min-width: auto;
+  }
+  
+  .approach-card {
+    padding: 16px;
+  }
+  
+  .approach-title {
+    font-size: 15px;
+  }
+}

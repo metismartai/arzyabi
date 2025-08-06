@@ -1,0 +1,600 @@
+/* ApproachDetail.css */
+.approach-detail-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  direction: rtl;
+}
+
+/* هدر صفحه */
+.detail-header {
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f7fafc;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #4a5568;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.share-btn {
+  background: #f7fafc;
+  color: #4a5568;
+}
+
+.share-btn:hover {
+  background: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+.download-btn {
+  background: #ebf8ff;
+  color: #3182ce;
+  border-color: #bee3f8;
+}
+
+.download-btn:hover {
+  background: #bee3f8;
+  border-color: #90cdf4;
+}
+
+.edit-btn {
+  background: #f0fff4;
+  color: #38a169;
+  border-color: #9ae6b4;
+}
+
+.edit-btn:hover {
+  background: #c6f6d5;
+  border-color: #68d391;
+}
+
+/* محتوای هدر */
+.header-content {
+  padding: 24px;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.title-section h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+  flex: 1;
+}
+
+.approach-code {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* اطلاعات متا */
+.meta-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meta-label {
+  font-weight: 600;
+}
+
+.meta-value {
+  color: #2d3748;
+}
+
+/* تب‌ها */
+.detail-tabs {
+  background: white;
+  margin: 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.tabs-nav {
+  display: flex;
+  background: #f7fafc;
+  border-bottom: 1px solid #e2e8f0;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  color: #4a5568;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  position: relative;
+}
+
+.tab-btn:hover {
+  background: #edf2f7;
+  color: #2d3748;
+}
+
+.tab-btn.active {
+  background: white;
+  color: #3182ce;
+  font-weight: 600;
+}
+
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3182ce, #63b3ed);
+}
+
+/* محتوای تب‌ها */
+.tabs-content {
+  padding: 24px;
+}
+
+.tab-content {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* تب نمای کلی */
+.overview-tab .overview-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.overview-section {
+  background: #f7fafc;
+  padding: 20px;
+  border-radius: 8px;
+  border-right: 4px solid #3182ce;
+}
+
+.overview-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 12px 0;
+}
+
+.overview-section p {
+  color: #4a5568;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* آمار نمای کلی */
+.overview-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  color: #3182ce;
+  background: #ebf8ff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-number {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #718096;
+  margin-top: 4px;
+}
+
+/* شبکه آیتم‌ها */
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.item-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.2s;
+}
+
+.item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #3182ce;
+}
+
+.item-card h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 12px 0;
+}
+
+.item-card p {
+  color: #4a5568;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* جدول شاخص‌ها */
+.indicators-table {
+  overflow-x: auto;
+}
+
+.indicators-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.indicators-table th {
+  background: #f7fafc;
+  padding: 16px;
+  text-align: right;
+  font-weight: 600;
+  color: #2d3748;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.indicators-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f7fafc;
+  color: #4a5568;
+}
+
+.indicators-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* شبکه مستندات */
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.document-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s;
+}
+
+.document-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #3182ce;
+}
+
+.document-icon {
+  width: 48px;
+  height: 48px;
+  background: #ebf8ff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3182ce;
+}
+
+.document-info {
+  flex: 1;
+}
+
+.document-info h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 4px 0;
+}
+
+.document-type {
+  font-size: 12px;
+  color: #718096;
+  margin: 0 0 4px 0;
+}
+
+.document-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #a0aec0;
+  margin: 0;
+}
+
+.document-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.download-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #3182ce;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.download-btn:hover {
+  background: #2c5aa0;
+  transform: scale(1.05);
+}
+
+/* حالت خالی */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #4a5568;
+}
+
+.empty-state p {
+  font-size: 16px;
+  margin: 0;
+}
+
+/* حالت‌های بارگذاری و خطا */
+.approach-detail-loading,
+.approach-detail-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 40px;
+  text-align: center;
+}
+
+.approach-detail-loading .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #3182ce;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+.approach-detail-error p {
+  color: #e53e3e;
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .overview-stats {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+  
+  .items-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+  
+  .documents-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .detail-header {
+    position: relative;
+  }
+  
+  .header-actions {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .header-buttons {
+    justify-content: center;
+  }
+  
+  .title-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .title-section h1 {
+    font-size: 24px;
+  }
+  
+  .meta-info {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .tabs-nav {
+    flex-direction: column;
+  }
+  
+  .tab-btn {
+    text-align: right;
+  }
+  
+  .items-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .overview-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .approach-detail-page {
+    margin: 16px;
+  }
+  
+  .detail-tabs {
+    margin: 16px;
+  }
+  
+  .tabs-content {
+    padding: 16px;
+  }
+}
+
+/* چاپ */
+@media print {
+  .header-actions,
+  .tabs-nav {
+    display: none !important;
+  }
+  
+  .detail-header {
+    position: relative !important;
+    border-bottom: 2px solid #000 !important;
+  }
+  
+  .tabs-content {
+    padding: 0 !important;
+  }
+  
+  .approach-detail-page {
+    background: white !important;
+    margin: 0 !important;
+  }
+  
+  .detail-tabs {
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  .tab-content {
+    display: block !important;
+  }
+  
+  .stat-card,
+  .item-card,
+  .document-card {
+    break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}

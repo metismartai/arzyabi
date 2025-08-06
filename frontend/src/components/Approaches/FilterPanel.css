@@ -1,0 +1,216 @@
+/* FilterPanel.css */
+.filter-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+/* هدر فیلتر */
+.filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f7fafc;
+}
+
+.filter-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+}
+
+.clear-filters-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #fed7d7;
+  color: #c53030;
+  border: 1px solid #feb2b2;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-filters-btn:hover {
+  background: #feb2b2;
+  border-color: #fc8181;
+}
+
+/* محتوای فیلتر */
+.filter-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+/* بخش فیلتر */
+.filter-section {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.filter-section:last-child {
+  border-bottom: none;
+}
+
+.filter-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+
+.filter-section-header:hover {
+  background: #f7fafc;
+}
+
+.filter-section-header h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+}
+
+/* گزینه‌های فیلتر */
+.filter-options {
+  padding: 0 20px 16px 20px;
+  background: #fafafa;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.filter-option:hover {
+  background: rgba(49, 130, 206, 0.05);
+  border-radius: 4px;
+  margin: 0 -8px;
+  padding: 8px 8px;
+}
+
+.filter-option input[type="checkbox"] {
+  display: none;
+}
+
+/* چک‌باکس سفارشی */
+.checkmark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #cbd5e0;
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.filter-option input[type="checkbox"]:checked + .checkmark {
+  background: #3182ce;
+  border-color: #3182ce;
+}
+
+.filter-option input[type="checkbox"]:checked + .checkmark::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 5px;
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.filter-option input[type="checkbox"]:disabled + .checkmark {
+  background: #f7fafc;
+  border-color: #e2e8f0;
+  opacity: 0.5;
+}
+
+/* متن گزینه */
+.option-text {
+  flex: 1;
+  font-size: 13px;
+  color: #4a5568;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filter-option input[type="checkbox"]:disabled ~ .option-text {
+  color: #a0aec0;
+}
+
+.option-count {
+  font-size: 12px;
+  color: #718096;
+  background: #edf2f7;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.filter-option input[type="checkbox"]:checked ~ .option-text .option-count {
+  background: #bee3f8;
+  color: #2b6cb0;
+}
+
+/* اسکرول‌بار سفارشی */
+.filter-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filter-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.filter-content::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.filter-content::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+/* انیمیشن باز/بسته شدن */
+.filter-options {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    padding-bottom: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    padding-bottom: 16px;
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .filter-panel {
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .filter-content {
+    max-height: 300px;
+  }
+}
